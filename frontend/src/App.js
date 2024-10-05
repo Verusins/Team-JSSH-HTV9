@@ -26,7 +26,7 @@ function App() {
           <Content items={items} />
         </div>
         <div className="col-md-3">
-          <Sidebar addItem={addItem} />
+          <Sidebar addItem={addItem} items={items} />
         </div>
       </div>
     </div>
