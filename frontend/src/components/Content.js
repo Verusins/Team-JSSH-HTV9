@@ -1,10 +1,14 @@
 import React from 'react';
 
-function Content() {
+function Content({ items }) {
   return (
-    <div className="p-4">
-      <h1>Main Content</h1>
-      <p>This is the main content of the page.</p>
+    <div>
+      {items.map((item, index) => (
+        <div key={index} className="border-bottom py-2">
+          <strong>{item.name}</strong>
+          <p>{item.description}</p>
+        </div>
+      ))}
     </div>
   );
 }
