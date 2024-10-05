@@ -86,7 +86,7 @@ function Content({ items, onDelete }) {
             {index === 0 ? <FaUserTie size={85} color="#FFF" /> : <FaUser size={85} color="#FFF" />} {/* Conditional icon rendering */}
             {/* Color of the user icon */}
             <div>
-              <strong style={{ color: "#FFF", fontSize: "20px" }}>{item.name}</strong> {/* User name in the same color */}
+              <strong style={{ color: "#FFF", fontSize: "28px", fontFamily: "Afacad Flux" }}>{item.name}</strong> {/* User name in the same color */}
             </div>
           </div>
         );
