@@ -34,7 +34,7 @@ function Sidebar({ addItem }) {
           <Button variant="primary" onClick={handleShow} style={{ borderRadius: '50%', width: '30px', height: '30px', fontSize: '1rem', background: '#CBC6C6', border: 'none' }}>
             <FaPlus className="mr-2" style={{ cursor: 'pointer', transform: 'translate(-5px, -5px)' }} onClick={handleShow} />
           </Button>
-          <h4 style={{ margin: 0, paddingLeft: "10px" }}>TableAI</h4>
+          <h4 style={{ margin: 0, paddingLeft: "10px", fontSize: "2.5rem", fontFamily: "Afacad Flux" }}>Table<span style={{ color: '#6E95EA'}}>AI</span></h4>
         </div>
         <FaBars className="ml-2" style={{ cursor: 'pointer', marginRight: '20px' }} onClick={handleHistoryOpen} />
       </div>
@@ -49,12 +49,13 @@ function Sidebar({ addItem }) {
         </Modal.Header>
         <Modal.Body>
           <Form.Group>
-            <Form.Label>Name</Form.Label>
+            <Form.Label>Name (Max 15 characters)</Form.Label>
             <Form.Control
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter item name"
+              maxLength={15}
             />
           </Form.Group>
           <Form.Group className="mt-3">

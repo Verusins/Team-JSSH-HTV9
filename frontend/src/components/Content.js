@@ -102,6 +102,7 @@ function Content({ items, onDelete }) {
             <p><strong>Name:</strong> {selectedAgent.name}</p>
             <p><strong>Description:</strong> {selectedAgent.description}</p>
           </Modal.Body>
+          {/* 
           <Modal.Footer>
             <Button variant="danger" onClick={() => { onDelete(selectedAgent); handleClose(); }}>
               Delete Agent
@@ -109,7 +110,7 @@ function Content({ items, onDelete }) {
             <Button variant="secondary" onClick={handleClose}>
               Close
             </Button>
-          </Modal.Footer>
+          </Modal.Footer> */}
         </Modal>
       )}
     </div>
