@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Sidebar from './components/Sidebar';
 import Content from './components/Content';
+import './index.css';
 
 function App() {
   const [items, setItems] = useState([
@@ -14,7 +15,12 @@ function App() {
   };
 
   return (
-    <div className="container-fluid">
+    <div className="container-fluid"
+        style={{
+          backgroundColor: '#6E95EA',
+          padding: '0',
+          margin: '0',
+        }}>
       <div className="row">
         <div className="col-md-9">
           <Content items={items} />
