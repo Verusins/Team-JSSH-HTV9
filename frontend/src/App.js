@@ -9,6 +9,8 @@ function App() {
     { name: 'Security', description: 'Keep track of every solution to align with security standards' },
   ]);
 
+  const [isLoading, setIsLoading] = useState(false); // State for loading
+
   // Function to add a new item with name and description
   const addItem = (newItem) => {
     setItems([...items, newItem]);
@@ -23,10 +25,10 @@ function App() {
         }}>
       <div className="row">
         <div className="col-md-9">
-          <Content items={items} />
+        <Content items={items} isLoading={isLoading} />
         </div>
         <div className="col-md-3">
-          <Sidebar addItem={addItem} items={items} />
+          <Sidebar addItem={addItem} items={items} isLoading={isLoading} setIsLoading={setIsLoading} />
         </div>
       </div>
     </div>

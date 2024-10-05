@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaUser, FaUserTie } from 'react-icons/fa'; // Importing the user icon
 // import { MdPerson } from 'react-icons/md';
 import { Modal, Button } from 'react-bootstrap'; // Bootstrap modal for pop-up
 
-function Content({ items, onDelete }) {
+function Content({ items, isLoading }) {
   const radius = 250; // Radius of the table circle
   const [selectedAgent, setSelectedAgent] = useState(null); // To track the clicked agent for modal
+  const [speakingAgentIndex, setSpeakingAgentIndex] = useState(0); // For alternating colors
+
+
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setSpeakingAgentIndex((prevIndex) => (prevIndex + 1) % items.length); // Cycle through agents
+      }, 500); // Change color every 500ms
+      return () => clearInterval(interval); // Cleanup on unmount or stop
+    }
+  }, [isLoading, items.length]);
 
   // Calculate the positions of agents around the table
   const calculatePosition = (index, totalAgents) => {
@@ -66,9 +77,8 @@ function Content({ items, onDelete }) {
       {/* Agents (user icons) */}
       {items.map((item, index) => {
         const { x, y } = calculatePosition(index, items.length);
-
-        // Determine the color for each agent
-        // const agentColor = index === 0 ? 'yellow' : 'white'; // Security (first agent) is yellow, others are white
+        const isSpeaking = isLoading && index === speakingAgentIndex; // Highlight the speaking agent
+        const agentColor = isSpeaking ? '#CCC' : '#FFF'; // Alternate color when loading
 
         return (
           <div
@@ -83,10 +93,14 @@ function Content({ items, onDelete }) {
             }}
             onClick={() => handleAgentClick(item)} // Click event to open the modal
           >
-            {index === 0 ? <FaUserTie size={85} color="#FFF" /> : <FaUser size={85} color="#FFF" />} {/* Conditional icon rendering */}
-            {/* Color of the user icon */}
+            {index === 0 ? (
+              <FaUserTie size={85} color={agentColor} />
+            ) : (
+              <FaUser size={85} color={agentColor} />
+            )}
             <div>
-              <strong style={{ color: "#FFF", fontSize: "28px", fontFamily: "Afacad Flux" }}>{item.name}</strong> {/* User name in the same color */}
+              <strong style={{ color: agentColor, fontSize: '28px', fontFamily: 'Afacad Flux' }}>
+                {item.name}</strong> {/* User name in the same color */}
             </div>
           </div>
         );
