@@ -42,24 +42,68 @@ def read_and_parse_file(file_path):
         print(f"An error occurred while reading or parsing the file: {e}")
         return None
 
-def upload (fp, client):
+def upload_txt (fp, client):
     db = client.history
     history_collection = db.singleton
     content = read_and_parse_file(fp)
-    print(type(content))
+    for dictionary in content:
+        db.singleton.insert_one(dictionary)
+    print("upload success")
+
+def upload_json(jsonFile, client):
+    db = client.history
+    history_collection = db.singleton
+    for dictionary in jsonFile:
+        db.singleton.insert_one(dictionary)
+    print("upload success")
+
+def format_meeting_records(documents):
+    """
+    Converts a list of MongoDB documents into a human-readable string format, 
+    separating each meeting by the 'TERMINATE' marker and formatting each speaker's content.
+    
+    :param documents: List of dictionaries containing 'content', 'role', and 'name'.
+    :return: A string that organizes the content into separate meetings, formatted for readability.
+    """
+    meetings = []
+    current_meeting = []
+    
+    for document in documents:
+        content = document['content'].strip()
+        role = document['role']
+        name = document['name']
+        
+        # If the document's content is 'TERMINATE', finalize the current meeting and start a new one
+        if content == 'TERMINATE':
+            meetings.append('\n'.join(current_meeting))  # Finalize the current meeting
+            current_meeting = []  # Reset for the next meeting
+        else:
+            # Format each speaker's contribution
+            formatted_entry = f"{name} ({role}):\n{content}\n"
+            current_meeting.append(formatted_entry)
+    
+    # If there's leftover content after the last 'TERMINATE', finalize it
+    if current_meeting:
+        meetings.append('\n'.join(current_meeting))
+    
+    # Combine all meetings with a separator between them
+    formatted_output = "\n\n=== New Meeting ===\n\n".join(meetings)
+    
+    return formatted_output
+
+def download_from_db(client):
+    db = client.history
+    history_collection = db.singleton
+    result = history_collection.find({},{"content": 1, "role": 1, "name": 1, "_id": 0})
+    return format_meeting_records(result)
+
 
 if __name__ == "__main__":
     uri = "mongodb+srv://wangyukun721:ii4GZUByt7WrDxLL@cluster0.ld92j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
     with connect_to_mongoDB(uri) as client:
-        db = client.history
-        history_collection = db.singleton
-        file_path = 'test.txt'
-        content = read_and_parse_file(file_path)
-        print(type(content))
-        result = history_collection.insert_one(content)
-        document_id = result.inserted_id
-        print(f"_id of inserted document: {document_id}")
+        meetings = download_from_db(client)
+        print(meetings)
         client.close()
 
         
