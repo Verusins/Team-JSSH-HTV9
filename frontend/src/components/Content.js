@@ -78,7 +78,7 @@ function Content({ items, isLoading }) {
       {items.map((item, index) => {
         const { x, y } = calculatePosition(index, items.length);
         const isSpeaking = isLoading && index === speakingAgentIndex; // Highlight the speaking agent
-        const agentColor = isSpeaking ? '#CCC' : '#FFF'; // Alternate color when loading
+        const agentColor = isSpeaking ? '#CBC6C6' : '#FFF'; // Alternate color when loading
 
         return (
           <div

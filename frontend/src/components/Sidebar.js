@@ -8,7 +8,6 @@ function Sidebar({ addItem, items, isLoading, setIsLoading }) {
   const [description, setDescription] = useState('');
   const [prompt, setPrompt] = useState('');
   const [chatMessages, setChatMessages] = useState([]); // State to store chat messages
-//   const [isLoading, setIsLoading] = useState(false);
   const [typedMessage, setTypedMessage] = useState('');
 
   const handleShow = () => setShowPopup(true);
