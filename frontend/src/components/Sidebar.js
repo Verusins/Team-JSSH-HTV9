@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Spinner } from 'react-bootstrap';
 import { FaPlus, FaBars, FaTimes } from 'react-icons/fa';
+import axios from 'axios';
 
 function Sidebar({ addItem, items, isLoading, setIsLoading }) {
   const [showPopup, setShowPopup] = useState(false);
@@ -24,6 +25,19 @@ function Sidebar({ addItem, items, isLoading, setIsLoading }) {
     }
   };
 
+//   const handleSend = async () => {
+//     setIsLoading(true);
+    
+//     try {
+//       const response = await axios.get('http://127.0.0.1:8000/history'); // Replace with your actual backend endpoint
+//       setHistoryData(response.data); // Assuming the API returns the history data in the same format
+//     } catch (error) {
+//       console.error('Error fetching history data:', error);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
   const handleSend = async () => {
     const agentsArray = items.map(item => ({
       name: item.name,
@@ -35,37 +49,34 @@ function Sidebar({ addItem, items, isLoading, setIsLoading }) {
       agents: agentsArray,
     };
 
+    console.log(dataToSend);
+
     setChatMessages([...chatMessages, { type: 'user', content: prompt }]);
     setPrompt('');
     setIsLoading(true);
 
     // Simulate a fake response
-    setTimeout(() => {
-      const response = {
-        data: {
-          message: `Here is a sample message with Python code`,
-          code: `
-            def factorial(n):
-                if n == 0:
-                    return 1
-                else:
-                    return n * factorial(n-1)
-
-            result = factorial(5)
-            print(f"Factorial of 5 is {result}")
-          `,
+    const sendData = async () => {
+        try {
+          // Call the API directly without delay
+          const response = await axios.post('http://127.0.0.1:8000/agents/', dataToSend);
+      
+          setTypedMessage(''); // Clear typed message
+      
+          const fullMessage = `${response.data.message}\n\n${response.data.code}`;
+          setChatMessages(prevMessages => [
+            ...prevMessages,
+            { type: 'assistant', content: fullMessage },
+          ]);
+          console.log(chatMessages);
+        } catch (error) {
+          console.error('Error fetching history data:', error);
+        } finally {
+          setIsLoading(false); // Stop loading spinner/indicator
         }
-      };
+    };
 
-      setTypedMessage('');
-      setIsLoading(false);
-
-      const fullMessage = `${response.data.message}\n\n${response.data.code}`;
-      setChatMessages(prevMessages => [
-        ...prevMessages,
-        { type: 'assistant', content: fullMessage },
-      ]);
-    }, 5000);
+    sendData();
   };
 
   // Fake API call for history data

@@ -4,15 +4,28 @@ from fastapi import FastAPI
 import logging
 from autogen import AssistantAgent, UserProxyAgent, GroupChat, GroupChatManager
 from mongoConnect import router
-
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 app.include_router(router)
 
+origins = [
+    "http://localhost:3000",  # If React is running on localhost:3000
+    "http://127.0.0.1:3000",  # Alternate localhost form
+    # You can add more URLs here if needed, like production URLs
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,            # Allows specified origins
+    allow_credentials=True,           # Allow cookies and authentication headers
+    allow_methods=["*"],              # Allows all HTTP methods (POST, GET, etc.)
+    allow_headers=["*"],              # Allows all headers
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-os.environ["OPENAI_API_KEY"] = ""
+os.environ["OPENAI_API_KEY"] = "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"
 
 default_name_list = ["Critical Analyst", "The Problem-Solving Specialist", "The Creative Writer"]
 default_system_prompt = [
@@ -32,7 +45,7 @@ llm_config_openai = {
 }
 
 input = {
-          "agents": [
+            "agents":[
                         {
                           "name": "Coder",
                           "system_prompt": "You are a coder."
@@ -46,7 +59,7 @@ input = {
                           "system_prompt": "You act as a proxy for the user, forwarding their requests to the system and managing responses."
                         }
                     ]
-          }
+        }
 
 def create_assistant_agent(name=default_name_list[1], system_message=default_system_prompt[1]):
     assistant = AssistantAgent(
