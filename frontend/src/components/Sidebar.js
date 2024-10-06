@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Spinner } from 'react-bootstrap';
-import { FaPlus, FaBars } from 'react-icons/fa';
+import { FaPlus, FaBars, FaTimes } from 'react-icons/fa';
 
 function Sidebar({ addItem, items, isLoading, setIsLoading }) {
   const [showPopup, setShowPopup] = useState(false);
+  const [showHistory, setShowHistory] = useState(false); // State for showing the history section
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [prompt, setPrompt] = useState('');
-  const [chatMessages, setChatMessages] = useState([]); // State to store chat messages
+  const [chatMessages, setChatMessages] = useState([]);
   const [typedMessage, setTypedMessage] = useState('');
+  const [historyData, setHistoryData] = useState(null); // State for fake API data
 
   const handleShow = () => setShowPopup(true);
   const handleClose = () => setShowPopup(false);
@@ -34,14 +36,14 @@ function Sidebar({ addItem, items, isLoading, setIsLoading }) {
     };
 
     setChatMessages([...chatMessages, { type: 'user', content: prompt }]);
-    setPrompt(''); // Clear the input
-    setIsLoading(true); // Start loading
+    setPrompt('');
+    setIsLoading(true);
 
-    // Simulate loading for 5 seconds
+    // Simulate a fake response
     setTimeout(() => {
       const response = {
         data: {
-          message: `Sure, here is a Python code to compute the factorial of a number:\n\n`,
+          message: `Here is a sample message with Python code`,
           code: `
             def factorial(n):
                 if n == 0:
@@ -49,68 +51,46 @@ function Sidebar({ addItem, items, isLoading, setIsLoading }) {
                 else:
                     return n * factorial(n-1)
 
-            number = 5
-            result = factorial(number)
-            print(f"The factorial of {number} is {result}")
+            result = factorial(5)
+            print(f"Factorial of 5 is {result}")
           `,
-          executionResult: 'The factorial of 5 is 120',
         }
       };
 
-      const assistantResponse = response.data.message;
-      const codeSample = response.data.code;
-      const executionResult = response.data.executionResult;
+      setTypedMessage('');
+      setIsLoading(false);
 
-      // Add loading message for assistant while typing
+      const fullMessage = `${response.data.message}\n\n${response.data.code}`;
       setChatMessages(prevMessages => [
         ...prevMessages,
-        { type: 'assistant', content: '' }, // Empty content for now
+        { type: 'assistant', content: fullMessage },
       ]);
-
-      // Simulate typing the message out character by character
-      let index = -1;
-      const fullMessage = assistantResponse + codeSample + `\n\nExecution Result: ${executionResult}`;
-
-      const typeOutMessage = () => {
-        if (index < fullMessage.length) {
-          setTypedMessage(prev => prev + fullMessage.charAt(index));
-          index++;
-          setTimeout(typeOutMessage, 25); // Adjust typing speed here
-        }
-      };
-
-      setTypedMessage(''); // Reset typed message
-      setIsLoading(false); // Stop loading
-      typeOutMessage(); // Start typing out the message
-    }, 5000); // 5-second loading delay
+    }, 5000);
   };
 
-  useEffect(() => {
-    if (typedMessage.length > 0) {
-      setChatMessages(prevMessages => {
-        const newMessages = [...prevMessages];
-        newMessages[newMessages.length - 1].content = typedMessage;
-        return newMessages;
-      });
-    }
-  }, [typedMessage]);
+  // Fake API call for history data
+  const fetchHistoryData = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      const fakeData = [
+        { id: 1, title: 'Chat with Assistant', timestamp: '2024-10-05 12:30:00' },
+        { id: 2, title: 'Chat about JavaScript', timestamp: '2024-10-04 09:15:00' },
+        { id: 3, title: 'React Project Discussion', timestamp: '2024-10-03 16:45:00' },
+      ];
+      setHistoryData(fakeData);
+      setIsLoading(false);
+    }, 2000); // Simulate 2-second delay
+  };
 
-  const renderChatMessage = (message, index) => {
-    if (message.type === 'user') {
-      return <div key={index}><strong>You:</strong> {message.content}</div>;
-    } else if (message.type === 'assistant') {
-      return <div key={index}><strong>Assistant:</strong> {message.content}</div>;
-    } else if (message.type === 'code') {
-      return (
-        <pre key={index} style={{ background: '#f1f1f1', padding: '10px', borderRadius: '5px' }}>
-          {message.content}
-        </pre>
-      );
+  const toggleHistory = () => {
+    setShowHistory(!showHistory);
+    if (!showHistory) {
+      fetchHistoryData(); // Fetch history data when the history tab is opened
     }
   };
 
   return (
-    <div className="d-flex flex-column justify-content-between bg-light" style={{ height: '100vh', padding: '5px 15px 0', transform: 'translateX(7px)', borderRadius: '15px 0 0 15px' }}>
+    <div className="d-flex flex-column justify-content-between bg-light" style={{ height: '100vh', padding: '5px 15px 0', borderRadius: '15px 0 0 15px' }}>
       {/* Header */}
       <div style={{ height: '100px', position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', paddingLeft: '20px' }}>
@@ -119,11 +99,68 @@ function Sidebar({ addItem, items, isLoading, setIsLoading }) {
           </Button>
           <h4 style={{ margin: 0, paddingLeft: "10px", fontSize: "2.5rem", fontFamily: "Afacad Flux" }}>Table<span style={{ color: '#6E95EA'}}>AI</span></h4>
         </div>
-        <FaBars className="ml-2" style={{ cursor: 'pointer', marginRight: '20px' }} onClick={() => console.log("History tab opened!")} />
+        {!showHistory ? (
+          <FaBars className="ml-2" style={{ cursor: 'pointer', marginRight: '20px' }} onClick={toggleHistory} />
+        ) : (
+          <FaTimes className="ml-2" style={{ cursor: 'pointer', marginRight: '20px' }} onClick={toggleHistory} />
+        )}
       </div>
 
       {/* Divider */}
       <div style={{ borderBottom: '2px solid #CBC6C6', margin: '0px 10px', padding: 0, transform: 'translateY(-10px)' }} />
+
+      {/* History Section */}
+      {showHistory ? (
+        <div style={{ flexGrow: 1, padding: '10px', overflowY: 'auto' }}>
+          <h5>History</h5>
+          {isLoading ? (
+            <div style={{ textAlign: 'center' }}>
+              <Spinner animation="border" />
+            </div>
+          ) : (
+            historyData && historyData.map((item) => (
+              <div key={item.id} style={{ marginBottom: '10px' }}>
+                <strong>{item.title}</strong>
+                <p>{item.timestamp}</p>
+              </div>
+            ))
+          )}
+        </div>
+      ) : (
+        // Chat Section
+        <div className="flex-grow-1">
+          <div className="d-flex flex-column justify-content-end" style={{ height: 'calc(100vh - 120px)', padding: '10px', borderRadius: '10px' }}>
+            {/* Chat message area */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '10px' }}>
+              {chatMessages.map((message, index) => (
+                <div key={index}>
+                  {message.type === 'user' && <strong>You:</strong>} {message.content}
+                </div>
+              ))}
+              {isLoading && (
+                <div className="spinner" style={{ textAlign: 'center', margin: '20px 0' }}>
+                  <Spinner animation="border" />
+                </div>
+              )}
+            </div>
+
+            {/* Input Box */}
+            <div className="input-group">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Enter prompt"
+                style={{ borderRadius: '15px 0 0 15px' }}
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+              />
+              <Button onClick={handleSend} style={{ borderRadius: '0 15px 15px 0', background: '#CBC6C6', border: 'none' }}>
+                Send
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Popup for adding new item */}
       <Modal show={showPopup} onHide={handleClose} centered>
@@ -160,38 +197,6 @@ function Sidebar({ addItem, items, isLoading, setIsLoading }) {
           </Button>
         </Modal.Footer>
       </Modal>
-
-      {/* Chat Box */}
-      <div className="flex-grow-1">
-        <div className="d-flex flex-column justify-content-end" style={{ height: 'calc(100vh - 120px)', padding: '10px', borderRadius: '10px' }}>
-          {/* Chat message area */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '10px' }}>
-            {chatMessages.map((message, index) => renderChatMessage(message, index))}
-            {isLoading && (
-            <div className="spinner" style={{ textAlign: 'center', margin: '20px 0' }}>
-                <div className="spinner-border" role="status">
-                <span className="visually-hidden">Loading...</span>
-                </div>
-            </div>
-            )}
-          </div>
-
-          {/* Input Box */}
-          <div className="input-group">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Enter prompt"
-              style={{ borderRadius: '15px 0 0 15px' }}
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-            />
-            <button className="btn btn-primary" type="button" style={{ borderRadius: '0 15px 15px 0', background: '#CBC6C6', border: 'none' }} onClick={handleSend}>
-              Send
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
