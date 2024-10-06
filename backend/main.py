@@ -100,7 +100,7 @@ async def receive_agents(agents_request: dict):
         else:
             return {"error": "Unknown agent type"}
     
-    logger.info("Created agents: %s", created_agents)
+    # logger.info("Created agents: %s", created_agents)
 
     # return {"message": "Agents created successfully", "agents": "created_agents", "user_proxy": "user_proxy"}
     # return {"message": "Agents created successfully", "agents": agents}
@@ -117,10 +117,6 @@ async def receive_agents(agents_request: dict):
     Can you design a slogan for hack the vellay
     """
 
-    task1 = """
-    Which stock has the maximum growth in the past year? Write code to get the date today, and then plot the graph of this
-    """
-
     result = user_proxy.initiate_chat(
         manager,
         message=task
@@ -128,9 +124,10 @@ async def receive_agents(agents_request: dict):
     
     # conversation_summary = " ".join(result.chat_history)
     # result_text = str(result.summary)
-    result_text = str(result.chat_history)
+    result_text = groupchat.messages
+    full_result_text = str(result_text)
     
-    return {"conversation_summary": result_text}
+    return {"conversation_summary": full_result_text}
     
 
 if __name__ == "__main__":
