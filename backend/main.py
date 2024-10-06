@@ -154,6 +154,8 @@ async def receive_agents(agents_request: dict):
             name_have_seen = []
             round += 1
             json_data[f"round-{round}"] = {}
+
+    logger.info(f"Chat history Json Data: {json_data}")
     
     return {"conversation_summary": json_data}
     

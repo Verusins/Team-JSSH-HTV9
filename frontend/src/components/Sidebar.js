@@ -62,13 +62,13 @@ function Sidebar({ addItem, items, isLoading, setIsLoading }) {
           const response = await axios.post('http://127.0.0.1:8000/agents/', dataToSend);
       
           setTypedMessage(''); // Clear typed message
-      
-          const fullMessage = `${response.data.message}\n\n${response.data.code}`;
+            // console.log(response.data);
+          const fullMessage = JSON.stringify(response.data); // `${response.data.message}\n\n${response.data.code}`;
+          
           setChatMessages(prevMessages => [
             ...prevMessages,
             { type: 'assistant', content: fullMessage },
           ]);
-          console.log(chatMessages);
         } catch (error) {
           console.error('Error fetching history data:', error);
         } finally {
