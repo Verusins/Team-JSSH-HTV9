@@ -10,8 +10,8 @@ app = FastAPI()
 app.include_router(router)
 
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# logging.basicConfig(level=logging.INFO)
+# logger = logging.getLogger(__name__)
 os.environ["OPENAI_API_KEY"] = ""
 
 default_name_list = ["Critical Analyst", "The Problem-Solving Specialist", "The Creative Writer"]
@@ -77,6 +77,8 @@ Otherwise, reply CONTINUE, or the reason why the task is not solved yet."""
 async def receive_agents(agents_request: dict):
     
     agents = agents_request["agents"]
+    
+    task = agents_request["prompt"]
 
     created_agents = []
     
@@ -112,22 +114,35 @@ async def receive_agents(agents_request: dict):
     )
     
     manager = GroupChatManager(groupchat=groupchat, llm_config=llm_config_openai)
-    
-    task = """
-    Can you design a slogan for hack the vellay
-    """
 
     result = user_proxy.initiate_chat(
         manager,
         message=task
     )
-    
-    # conversation_summary = " ".join(result.chat_history)
-    # result_text = str(result.summary)
     result_text = groupchat.messages
-    full_result_text = str(result_text)
+    # chat_history_list = str(result_text)
+    chat_history_list = result_text
+    # chat_history_list = [{'content': '\nTell me about the meaning of life\n', 'role': 'user', 'name': 'security'}, {'content': "I'm here to assist with coding-related questions. If you have any coding tasks or questions, feel free to ask!", 'role': 'user', 'name': 'Coder'}, {'content': 'How about a software product that helps users track and manage their digital footprint and online security? It could provide insights into what personal information is available online, offer suggestions for improving privacy settings, and alert users to potential security risks. Users could also receive tips on how to enhance their online security practices. What do you think?', 'role': 'user', 'name': 'Product_manager'}, {'content': "That sounds like a valuable and relevant software product idea! It addresses a growing concern for many users about their online privacy and security. Implementing features like tracking personal information online, providing privacy setting suggestions, and offering security risk alerts can be very beneficial. Additionally, providing tips to enhance online security practices can help users better protect themselves. It's important to consider user-friendly interfaces and clear communication of the benefits to attract and retain users. If you need help with the technical aspects or development of this product, feel free to ask!", 'role': 'user', 'name': 'Coder'}, {'content': "Great to hear that you find the software product idea valuable! If you have any specific technical questions or need assistance with the development of this product, feel free to ask. I'm here to help with any coding-related tasks or challenges you may encounter along the way.", 'role': 'user', 'name': 'Product_manager'}, {'content': 'TERMINATE', 'role': 'user', 'name': 'Coder'}]
+
+    names = []
+    for item in chat_history_list:
+        names.append(item['name'])
+
+    json_data = {}
+    round = 1
+    name_have_seen = []
+    json_data[f"round-{round}"] = {}
+    # begin with "round" + round to combine to a string
+    for i in range(len(chat_history_list)):
+        if not chat_history_list[i]['name'] in name_have_seen:
+            name_have_seen.append(chat_history_list[i]['name'])
+            json_data[f"round-{round}"][chat_history_list[i]['name']] = chat_history_list[i]['content']
+        else:
+            name_have_seen = []
+            round += 1
+            json_data[f"round-{round}"] = {}
     
-    return {"conversation_summary": full_result_text}
+    return {"conversation_summary": json_data}
     
 
 if __name__ == "__main__":
