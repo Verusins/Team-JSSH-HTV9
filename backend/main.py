@@ -12,7 +12,7 @@ app.include_router(router)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-os.environ["OPENAI_API_KEY"] = "sk-Jdlmh3gPtTNwtFqRFKTvT3Oc-tlyZwc4Ja0okdmpvfT3BlbkFJHJ4o9fss8D41zBONYTXZciwBmZOiwhHujPdwCDEe4A"
+os.environ["OPENAI_API_KEY"] = ""
 
 default_name_list = ["Critical Analyst", "The Problem-Solving Specialist", "The Creative Writer"]
 default_system_prompt = [

@@ -109,7 +109,7 @@ async def download_from_db(client = None):  # Dependency injection
 
     if client is None:
         # Connect to MongoDB if client is not provided through dependency injection
-        client = connect_to_mongoDB(uri="mongodb+srv://wangyukun721:ii4GZUByt7WrDxLL@cluster0.ld92j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+        client = connect_to_mongoDB(uri="mongodb+srv://wangyukun721:@cluster0.ld92j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
     db = client.history
     history_collection = db.singleton
     result = history_collection.find({}, {"content": 1, "role": 1, "name": 1, "_id": 0})  # Project relevant fields
@@ -122,7 +122,7 @@ async def download_from_db(client = None):  # Dependency injection
 
 
 if __name__ == "__main__":
-    uri = "mongodb+srv://wangyukun721:ii4GZUByt7WrDxLL@cluster0.ld92j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    uri = "mongodb+srv://wangyukun721:@cluster0.ld92j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
     # with connect_to_mongoDB(uri) as client:
     #     meetings = download_from_db(client)
