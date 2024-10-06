@@ -1,9 +1,19 @@
 import pprint
 import ast
+from fastapi import APIRouter
 
 from pymongo import MongoClient
 import pymongo
 from bson.objectid import ObjectId
+from pydantic import BaseModel
+
+class MeetingRecord(BaseModel):
+    name: str
+    role: str
+    content: str
+
+router = APIRouter()
+
 
 def connect_to_mongoDB(uri):
     try:
@@ -91,19 +101,32 @@ def format_meeting_records(documents):
     
     return formatted_output
 
-def download_from_db(client):
+@router.get("/read_history/")
+async def download_from_db(client = None):  # Dependency injection
+    """
+    Downloads the entire meeting history from MongoDB and returns it as a formatted string.
+    """
+
+    if client is None:
+        # Connect to MongoDB if client is not provided through dependency injection
+        client = connect_to_mongoDB(uri="mongodb+srv://wangyukun721:ii4GZUByt7WrDxLL@cluster0.ld92j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
     db = client.history
     history_collection = db.singleton
-    result = history_collection.find({},{"content": 1, "role": 1, "name": 1, "_id": 0})
-    return format_meeting_records(result)
+    result = history_collection.find({}, {"content": 1, "role": 1, "name": 1, "_id": 0})  # Project relevant fields
+    meetings = format_meeting_records(result)
+    # Close the connection if not using dependency injection
+    if client is not None:
+        client.close()
+
+    return meetings
 
 
 if __name__ == "__main__":
     uri = "mongodb+srv://wangyukun721:ii4GZUByt7WrDxLL@cluster0.ld92j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
-    with connect_to_mongoDB(uri) as client:
-        meetings = download_from_db(client)
-        print(meetings)
-        client.close()
+    # with connect_to_mongoDB(uri) as client:
+    #     meetings = download_from_db(client)
+    #     print(meetings)
+    #     client.close()
 
         

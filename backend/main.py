@@ -3,14 +3,16 @@ from fastapi import FastAPI
 # import autogen
 import logging
 from autogen import AssistantAgent, UserProxyAgent, GroupChat, GroupChatManager
+from mongoConnect import router
 
 
 app = FastAPI()
+app.include_router(router)
 
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-os.environ["OPENAI_API_KEY"] = ""
+os.environ["OPENAI_API_KEY"] = "sk-Jdlmh3gPtTNwtFqRFKTvT3Oc-tlyZwc4Ja0okdmpvfT3BlbkFJHJ4o9fss8D41zBONYTXZciwBmZOiwhHujPdwCDEe4A"
 
 default_name_list = ["Critical Analyst", "The Problem-Solving Specialist", "The Creative Writer"]
 default_system_prompt = [
@@ -133,4 +135,4 @@ async def receive_agents(agents_request: dict):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000)
